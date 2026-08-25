@@ -1,0 +1,4 @@
+# Copyrighted standards kept as local research material only.
+references/schema/*.pdf
+
+/target/

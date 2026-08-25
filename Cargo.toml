@@ -1,0 +1,12 @@
+[workspace]
+resolver = "2"
+members = ["openbim-cde"]
+
+[profile.release]
+opt-level = 3
+lto = "thin"
+codegen-units = 1
+strip = true
+
+[profile.dev]
+opt-level = 1

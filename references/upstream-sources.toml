@@ -1,0 +1,31 @@
+# Evidence lock only. Upstream schema files are not redistributed here because
+# the repositories do not provide an explicit schema redistribution license.
+
+[[source]]
+name = "buildingSMART Foundation API 1.1"
+url = "https://github.com/buildingSMART/foundation-API/tree/release_1_1"
+commit = "2c552eae435d575f1df7c11ff9ea19e3d2a324ce"
+artifacts = [
+  "schemas/auth_GET.json sha256:28f6ece4cbb180450c35190ca91860209d0b73aaa446982bde0abbbf43dad906",
+  "schemas/dynRegClient_GET.json sha256:8cfaaa2e205a24cc64502627178304567849862146eab0a26d7e9030503b0968",
+  "schemas/dynRegClient_POST.json sha256:ba0b5e258bf1ff3d65e91162496ff2c80820fe60de655e982fbda4d03f34aba1",
+  "schemas/error.json sha256:cec6b1a36818b2b3c5bfc9030e440e5fec0f97cfea263e2f6cf8229b93f24b63",
+  "schemas/user_GET.json sha256:9fcacd7b5659863908edffb5a2f64a2929b32a7032db4413869e31cf7e55328e",
+  "schemas/versions_GET.json sha256:38e32d9cc2ce87eba72a583b6ef7fb18e5569191566727627dee9d77a842d38d",
+]
+
+[[source]]
+name = "buildingSMART Documents API 1.0"
+url = "https://github.com/buildingSMART/documents-API/tree/release_1_0"
+commit = "938bd7636e094c2dc3c65ad6dae846ac3c7b6a9b"
+artifacts = [
+  "swagger.yaml sha256:b6d5b5ee5da62648e385d5e468a9589f3ea4b385fabcfd3598b5a8bb668b6bbf",
+]
+
+[[source]]
+name = "buildingSMART OpenCDE API archive (legacy research only)"
+url = "https://github.com/buildingSMART/OpenCDE-API/tree/master"
+commit = "13b359fbd6ac2299cc9a02ace1f9b67563715cd1"
+artifacts = [
+  "openapi/openCDE-spec.yaml sha256:4da013375e3edf45db1ed31b1c1fcb32f672ca939c56b6beb001f3f1972fd877",
+]

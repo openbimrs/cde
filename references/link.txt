@@ -1,0 +1,6 @@
+Current machine-readable sources:
+https://github.com/buildingSMART/foundation-API/tree/release_1_1
+https://github.com/buildingSMART/documents-API/tree/release_1_0
+
+Archived umbrella/draft (research only):
+https://github.com/buildingSMART/OpenCDE-API
