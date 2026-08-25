@@ -8,12 +8,16 @@ permissions:
   contents: read
 
 jobs:
-  gate:
+  rust:
+    name: Rust gate
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: dtolnay/rust-toolchain@stable
+      - name: Check out repository
+        uses: actions/checkout@v7
+      - name: Install Rust 1.85
+        uses: dtolnay/rust-toolchain@1.85.0
         with:
-          toolchain: 1.85.0
+          components: rustfmt, clippy
       - uses: Swatinem/rust-cache@v2
-      - run: ./scripts/gate.sh
+      - name: Run verified gate
+        run: ./scripts/gate.sh
