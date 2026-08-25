@@ -21,17 +21,22 @@ assert_eq!(response.versions[0].as_ref().unwrap().api_id, "documents");
 - `documents` — all 24 named Documents API 1.0 OpenAPI component schemas and
   standardized entry paths.
 
-Required properties are required Rust fields; optional/nullable properties use
-`Option<T>`; closed wire enums are Rust enums. Unknown object properties are
-ignored for Foundation-compatible forward evolution. OAuth client secrets redact
-their `Debug` representation.
+Required properties are required Rust fields. Optional, non-null properties use
+`OptionalNonNull<T>` so explicit JSON `null` is rejected; properties that are
+explicitly nullable use `Option<T>`. Closed wire enums are Rust enums. Foundation
+objects accept extensions; Documents objects enforce each schema's declared
+`additionalProperties` policy.
+Client secrets, dynamic-registration browser/client URLs, upload URLs, multipart
+framing, and HTTP header values redact their `Debug` representations.
 
 This crate does **not** execute HTTP requests, OAuth flows, file transfers, or
 full JSON Schema validation. See the repository
 [architecture](https://github.com/openbimrs/cde/blob/main/docs/architecture.md)
 and [schema audit](https://github.com/openbimrs/cde/blob/main/docs/schema-audit.md).
 
-## License
+## License and publication status
 
-MIT for the Rust implementation. Standards and upstream schemas retain their
-respective rights and are not redistributed in this crate.
+MIT applies to the original Rust implementation. Standards and upstream schemas
+retain their respective rights and are not redistributed in this crate. The
+package has `publish = false` pending upstream rights clearance; exact source
+attribution ships in [`THIRD_PARTY_NOTICES.md`](THIRD_PARTY_NOTICES.md).

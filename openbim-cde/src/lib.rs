@@ -21,3 +21,6 @@
 pub mod documents;
 /// Foundation API 1.1 shared wire contracts.
 pub mod foundation;
+mod optional_non_null;
+
+pub use optional_non_null::OptionalNonNull;

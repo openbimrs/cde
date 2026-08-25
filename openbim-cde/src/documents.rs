@@ -3,6 +3,8 @@
 //! This module models every named schema in the release OpenAPI document. It is
 //! intentionally transport-agnostic: callers can use any HTTP stack.
 
+use crate::OptionalNonNull;
+use core::fmt;
 use serde::{Deserialize, Serialize};
 
 /// Standard entry path for the document-selection flow.
@@ -18,16 +20,27 @@ fn is_false(value: &bool) -> bool {
 
 /// Metadata associated with one document version.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct DocumentMetadata {
     /// Metadata key/value entries.
     pub metadata: Vec<DocumentMetadataEntry>,
 }
 
 /// Hypermedia link returned by a CDE.
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct LinkData {
     /// Absolute or server-defined link URL.
     pub url: String,
+}
+
+impl fmt::Debug for LinkData {
+    fn fmt(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
+        formatter
+            .debug_struct("LinkData")
+            .field("url", &"[REDACTED]")
+            .finish()
+    }
 }
 
 /// HTTP method permitted for an upload part.
@@ -42,34 +55,61 @@ pub enum HttpMethod {
 }
 
 /// Instructions for uploading one inclusive byte range of a file.
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct UploadFilePartInstruction {
     /// Upload target inherited from the OpenAPI `LinkData` schema.
     pub url: String,
     /// HTTP method to use.
     pub http_method: HttpMethod,
     /// Additional headers required by the upload target.
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub additional_headers: Option<Headers>,
+    #[serde(default, skip_serializing_if = "OptionalNonNull::is_missing")]
+    pub additional_headers: OptionalNonNull<Headers>,
     /// Whether to attach the OpenCDE authorization header.
     #[serde(default, skip_serializing_if = "is_false")]
     pub include_authorization: bool,
     /// Optional multipart framing supplied by the CDE.
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub multipart_form_data: Option<MultipartFormData>,
+    #[serde(default, skip_serializing_if = "OptionalNonNull::is_missing")]
+    pub multipart_form_data: OptionalNonNull<MultipartFormData>,
     /// Inclusive, zero-based first byte in this part.
     pub content_range_start: i64,
     /// Inclusive, zero-based final byte in this part.
     pub content_range_end: i64,
 }
 
+impl fmt::Debug for UploadFilePartInstruction {
+    fn fmt(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
+        formatter
+            .debug_struct("UploadFilePartInstruction")
+            .field("url", &"[REDACTED]")
+            .field("http_method", &self.http_method)
+            .field("additional_headers", &self.additional_headers)
+            .field("include_authorization", &self.include_authorization)
+            .field("multipart_form_data", &self.multipart_form_data)
+            .field("content_range_start", &self.content_range_start)
+            .field("content_range_end", &self.content_range_end)
+            .finish()
+    }
+}
+
 /// Server-provided multipart/form-data framing bytes, base64 encoded on wire.
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct MultipartFormData {
     /// Prefix prepended to the binary part, encoded as OpenAPI `byte`.
     pub prefix: String,
     /// Suffix appended to the binary part, encoded as OpenAPI `byte`.
     pub suffix: String,
+}
+
+impl fmt::Debug for MultipartFormData {
+    fn fmt(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
+        formatter
+            .debug_struct("MultipartFormData")
+            .field("prefix_bytes", &self.prefix.len())
+            .field("suffix_bytes", &self.suffix.len())
+            .finish_non_exhaustive()
+    }
 }
 
 /// Primitive type declared for a document metadata entry.
@@ -103,6 +143,7 @@ pub enum MetadataDataType {
 
 /// One document metadata key and its possibly multi-valued content.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct DocumentMetadataEntry {
     /// Metadata property name.
     pub name: String,
@@ -114,6 +155,7 @@ pub struct DocumentMetadataEntry {
 
 /// All known versions of a document.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct DocumentVersions {
     /// Ordered or server-provided document versions.
     pub documents: Vec<DocumentVersion>,
@@ -121,6 +163,7 @@ pub struct DocumentVersions {
 
 /// Documents selected by a user in the CDE UI.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct SelectedDocuments {
     /// Opaque CDE UI context, if supplied.
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -131,6 +174,7 @@ pub struct SelectedDocuments {
 
 /// One immutable version of a CDE document.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct DocumentVersion {
     /// Hypermedia operations associated with this version.
     pub links: DocumentVersionLinks,
@@ -150,6 +194,7 @@ pub struct DocumentVersion {
 
 /// Hypermedia operations for a document version.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct DocumentVersionLinks {
     /// Self link for this version.
     pub document_version: LinkData,
@@ -160,12 +205,13 @@ pub struct DocumentVersionLinks {
     /// Link listing all versions of the document.
     pub document_versions: LinkData,
     /// Optional browser UI for document details.
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub document_details: Option<LinkData>,
+    #[serde(default, skip_serializing_if = "OptionalNonNull::is_missing")]
+    pub document_details: OptionalNonNull<LinkData>,
 }
 
 /// Basic file information.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct FileDescription {
     /// File name.
     pub name: String,
@@ -174,7 +220,8 @@ pub struct FileDescription {
 }
 
 /// Result of initiating a document-discovery session.
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct DocumentDiscoverySessionInitialization {
     /// CDE browser UI where the user selects documents.
     pub select_documents_url: String,
@@ -182,8 +229,19 @@ pub struct DocumentDiscoverySessionInitialization {
     pub expires_in: i32,
 }
 
+impl fmt::Debug for DocumentDiscoverySessionInitialization {
+    fn fmt(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
+        formatter
+            .debug_struct("DocumentDiscoverySessionInitialization")
+            .field("select_documents_url", &"[REDACTED]")
+            .field("expires_in", &self.expires_in)
+            .finish()
+    }
+}
+
 /// Request that starts the document-selection flow.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct SelectDocuments {
     /// Browser redirect callback.
     pub callback: CallbackLink,
@@ -191,12 +249,13 @@ pub struct SelectDocuments {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub server_context: Option<String>,
     /// Preferred extensions, including their leading dots.
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub supported_file_extensions: Option<Vec<String>>,
+    #[serde(default, skip_serializing_if = "OptionalNonNull::is_missing")]
+    pub supported_file_extensions: OptionalNonNull<Vec<String>>,
 }
 
 /// File sizes used to calculate multipart upload instructions.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct UploadFileDetails {
     /// Files participating in the upload session.
     pub files: Vec<UploadFileDetail>,
@@ -204,6 +263,7 @@ pub struct UploadFileDetails {
 
 /// Size and session identifier for one local upload file.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct UploadFileDetail {
     /// File size in bytes.
     pub size_in_bytes: i64,
@@ -213,6 +273,7 @@ pub struct UploadFileDetail {
 
 /// Request that starts the document-upload flow.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct UploadDocuments {
     /// Browser redirect callback.
     pub callback: CallbackLink,
@@ -225,18 +286,20 @@ pub struct UploadDocuments {
 
 /// One local file offered to a CDE upload flow.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct FileToUpload {
     /// File name displayed by the CDE UI.
     pub file_name: String,
     /// Client-provided upload-session identifier.
     pub session_file_id: String,
     /// Existing document identifier when uploading a new version.
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub document_id: Option<String>,
+    #[serde(default, skip_serializing_if = "OptionalNonNull::is_missing")]
+    pub document_id: OptionalNonNull<String>,
 }
 
 /// Result of initiating a document-upload session.
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct DocumentUploadSessionInitialization {
     /// CDE browser UI where the user enters metadata.
     pub upload_ui_url: String,
@@ -246,8 +309,20 @@ pub struct DocumentUploadSessionInitialization {
     pub max_size_in_bytes: i64,
 }
 
+impl fmt::Debug for DocumentUploadSessionInitialization {
+    fn fmt(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
+        formatter
+            .debug_struct("DocumentUploadSessionInitialization")
+            .field("upload_ui_url", &"[REDACTED]")
+            .field("expires_in", &self.expires_in)
+            .field("max_size_in_bytes", &self.max_size_in_bytes)
+            .finish()
+    }
+}
+
 /// Upload instructions returned after CDE metadata entry.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct DocumentsToUpload {
     /// Opaque CDE UI context, if supplied.
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -258,6 +333,7 @@ pub struct DocumentsToUpload {
 
 /// Request sequence for uploading one document.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct DocumentToUpload {
     /// Client-provided upload-session identifier.
     pub session_file_id: String,
@@ -270,12 +346,23 @@ pub struct DocumentToUpload {
 }
 
 /// Browser redirect callback with a finite lifetime.
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct CallbackLink {
     /// Redirect target.
     pub url: String,
     /// URL lifetime in seconds.
     pub expires_in: i32,
+}
+
+impl fmt::Debug for CallbackLink {
+    fn fmt(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
+        formatter
+            .debug_struct("CallbackLink")
+            .field("url", &"[REDACTED]")
+            .field("expires_in", &self.expires_in)
+            .finish()
+    }
 }
 
 /// Additional HTTP headers required by a server-provided operation.
@@ -286,12 +373,22 @@ pub struct Headers {
 }
 
 /// One HTTP header.
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct HeaderValue {
     /// Header field name.
     pub name: String,
-    /// Header field value.
+    /// Header field value. Debug output is always redacted.
     pub value: String,
+}
+
+impl fmt::Debug for HeaderValue {
+    fn fmt(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
+        formatter
+            .debug_struct("HeaderValue")
+            .field("name", &self.name)
+            .field("value", &"[REDACTED]")
+            .finish()
+    }
 }
 
 /// Stable document identifiers to query for updates.

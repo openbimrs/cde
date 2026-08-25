@@ -7,12 +7,18 @@ license = "MIT"
 authors = ["point-grey"]
 repository = "https://github.com/openbimrs/cde"
 readme = "README.md"
+include = [
+    "src/**/*.rs",
+    "tests/**/*.rs",
+    "LICENSE",
+    "README.md",
+    "THIRD_PARTY_NOTICES.md",
+]
 description = "buildingSMART openCDE Foundation and Documents API wire contracts."
+publish = false
 keywords = ["bim", "openbim", "cde", "aec"]
 categories = ["api-bindings", "data-structures"]
 
 [dependencies]
 serde = { version = "1", features = ["derive"] }
-
-[dev-dependencies]
 serde_json = "1"

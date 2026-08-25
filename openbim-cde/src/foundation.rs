@@ -1,9 +1,10 @@
 //! Shared contracts from buildingSMART Foundation API 1.1.
 //!
 //! The upstream repository publishes JSON Schema Draft 3 fragments rather than
-//! one OpenAPI document. Requiredness follows the normative README where it is
-//! stricter than those fragments (notably `supported_oauth2_flows`).
+//! one OpenAPI document. Wire requiredness/nullability follows those released
+//! fragments; documented prose conflicts are called out on individual fields.
 
+use crate::OptionalNonNull;
 use core::fmt;
 use serde::{Deserialize, Serialize};
 
@@ -31,11 +32,11 @@ pub struct ApiVersion {
     /// Family-specific version, for example `1.1`.
     pub version_id: String,
     /// Link to the detailed specification.
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub detailed_version: Option<String>,
+    #[serde(default, skip_serializing_if = "OptionalNonNull::is_missing")]
+    pub detailed_version: OptionalNonNull<String>,
     /// Optional relocated base URL for this API.
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub api_base_url: Option<String>,
+    #[serde(default, skip_serializing_if = "OptionalNonNull::is_missing")]
+    pub api_base_url: OptionalNonNull<String>,
 }
 
 /// Authentication capabilities returned by the Foundation discovery endpoint.
@@ -78,18 +79,30 @@ pub enum OAuth2Flow {
 }
 
 /// Dynamic client-registration request.
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct DynamicClientRegistrationRequest {
     /// Human-readable client name.
     pub client_name: String,
     /// Optional client description.
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub client_description: Option<String>,
-    /// Optional URL with client information.
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub client_url: Option<String>,
-    /// Redirect URL after authorization.
+    #[serde(default, skip_serializing_if = "OptionalNonNull::is_missing")]
+    pub client_description: OptionalNonNull<String>,
+    /// Optional URL with client information. Debug output redacts the value.
+    #[serde(default, skip_serializing_if = "OptionalNonNull::is_missing")]
+    pub client_url: OptionalNonNull<String>,
+    /// Redirect URL after authorization. Debug output redacts the value.
     pub redirect_url: String,
+}
+
+impl fmt::Debug for DynamicClientRegistrationRequest {
+    fn fmt(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
+        formatter
+            .debug_struct("DynamicClientRegistrationRequest")
+            .field("client_name", &self.client_name)
+            .field("client_description", &self.client_description)
+            .field("client_url", &"[REDACTED]")
+            .field("redirect_url", &"[REDACTED]")
+            .finish()
+    }
 }
 
 /// Dynamic client-registration response.

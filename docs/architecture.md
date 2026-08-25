@@ -25,16 +25,19 @@ weight low.
 ## Wire fidelity rules
 
 - Required fields are non-optional Rust fields.
-- Nullable or optional fields use `Option<T>`.
+- Optional, non-null properties use `OptionalNonNull<T>` so omitted and explicit
+  `null` remain distinct; explicitly nullable properties use `Option<T>`.
 - Foundation's nullable array entries are represented as `Vec<Option<ApiVersion>>`.
 - Closed enumerations use Rust enums.
 - Date-time, URL, and base64 fields remain strings because the released schemas
   specify their wire representation but not a canonical Rust parser or storage
   policy.
-- Unknown object properties are ignored for forward compatibility, following
-  Foundation 1.1's compatibility convention.
-- OAuth client secrets use a transparent `ClientSecret` newtype with redacted
-  `Debug` output.
+- Foundation objects ignore unknown properties for forward compatibility.
+  Documents objects reject them where the OpenAPI schema declares
+  `additionalProperties: false`; the four open Documents schemas continue to
+  accept extension properties.
+- OAuth client secrets and credential-bearing upload URLs, headers, multipart
+  framing, and browser redirect URLs have redacted `Debug` output.
 
 Serde enforces shape, requiredness, and closed enums. It does not by itself
 implement every JSON Schema assertion such as `minLength`; runtime conformance

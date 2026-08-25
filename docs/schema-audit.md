@@ -19,7 +19,10 @@ Exact commits and SHA-256 hashes are locked in
 [`references/upstream-sources.toml`](../references/upstream-sources.toml).
 Upstream schemas are not copied into this repository because the inspected
 Foundation and Documents repositories contain no explicit redistribution
-license.
+license. Omitting those source files does not by itself settle whether derived
+wire declarations require permission. The Cargo package therefore sets
+`publish = false` pending written permission or legal clearance, and ships exact
+attribution in `THIRD_PARTY_NOTICES.md`.
 
 ## DIN SPEC 91391 is not the missing buildingSMART schema
 
@@ -53,12 +56,19 @@ The released sources are usable, but they are not internally perfect:
   `null`, while the Foundation 1.1 parameter table marks it required. Wire
   parsing follows the released machine schema; this crate does not yet claim a
   separate prose-conformance validator.
+- Foundation and Documents distinguish absent properties from explicit `null`.
+  Optional, non-null properties use the presence-aware `OptionalNonNull<T>`
+  wire type; fields whose schemas explicitly allow `null` continue to use
+  `Option<T>`.
 - Documents marks many objects `additionalProperties: false`, while Foundation
   1.1 §1.8 requires every OpenCDE request/response object to accept and ignore
-  extra properties. The Rust models follow the portfolio-wide Foundation rule.
+  extra properties. The modules preserve that family boundary: Foundation
+  objects remain extension-tolerant, while Documents objects enforce each
+  component's declared policy.
 - `UploadFilePartInstruction` combines a closed `LinkData` schema with more
   fields through `allOf`; strict JSON Schema evaluation can reject those added
-  fields. The Rust model implements the evident merged payload shape.
+  fields. The Rust model implements the evident merged payload shape and rejects
+  properties outside that merged set.
 - `upload_file_parts` uses `minLength` on an array where `minItems` was likely
   intended. This crate does not claim full JSON Schema validation.
 
@@ -73,8 +83,8 @@ normative prose rather than generated blindly.
   documentation. Those are quality-policy findings, not structural parse
   failures, and are not silently "fixed" in this crate.
 - The Rust tests deserialize every released named component and pin required
-  fields, enum rejection, defaults, nullable entries, extension tolerance, and
-  secret redaction.
+  fields, enum rejection, defaults, nullable entries, family-specific extension
+  policies, and secret redaction.
 
 ## What not to do
 

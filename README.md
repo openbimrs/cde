@@ -13,6 +13,7 @@ Pure-Rust wire contracts for the buildingSMART openCDE API family.
 | Documents API 1.0 payloads | Implemented: all 24 named OpenAPI components |
 | Serde JSON read/write | Implemented and tested |
 | Endpoint discovery constants | Implemented |
+| crates.io publication | Blocked pending upstream rights clearance |
 | HTTP client/server | Not implemented |
 | OAuth execution/token storage | Not implemented |
 | Full JSON Schema constraint validation | Not implemented |
@@ -24,7 +25,7 @@ async, TLS, OAuth, retry, and observability stacks.
 ## Workspace
 
 ```text
-openbim-cde/                 published Cargo crate
+openbim-cde/                 Cargo package (publication blocked)
   src/foundation.rs          Foundation API 1.1 models
   src/documents.rs           Documents API 1.0 models
 docs/architecture.md         boundaries and wire-fidelity decisions
@@ -37,8 +38,13 @@ scripts/gate.sh              complete standalone verification
 
 ```toml
 [dependencies]
-openbim-cde = "0.1.0"
+openbim-cde = { git = "https://github.com/openbimrs/cde.git" }
+serde_json = "1"
 ```
+
+The package has `publish = false` until the rights status of the upstream API
+descriptions is cleared. Pin a Git revision or the OpenBIM.rs submodule gitlink
+for reproducible builds.
 
 ```rust
 use openbim_cde::foundation::VersionsResponse;
@@ -68,8 +74,11 @@ See the evidence and the DIN §1/§4.2 tension in
 ./scripts/gate.sh
 ```
 
-The gate checks formatting, all targets, all tests/features, Clippy with warnings
-denied, rustdoc with warnings denied, and Cargo packaging.
+The package manifest uses an explicit inclusion boundary. The gate checks
+formatting, locked dependency resolution, all targets, all tests/features,
+Clippy and rustdoc with warnings denied, Cargo packaging, exact package-file
+classes, and inclusion of `THIRD_PARTY_NOTICES.md`. CI additionally runs
+`cargo-deny`.
 
 ## Integration
 
@@ -81,5 +90,7 @@ the superproject pin advances.
 
 ## License
 
-MIT for original Rust code. Upstream schema files and locally licensed DIN PDFs
-are not redistributed by this repository.
+MIT applies to original Rust code. Upstream schema files and locally licensed
+DIN PDFs are not redistributed. The upstream repositories expose no explicit
+schema license, so publication remains mechanically disabled pending rights
+clearance. See `openbim-cde/THIRD_PARTY_NOTICES.md`.

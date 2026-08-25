@@ -45,15 +45,19 @@ families.
 - [x] Add standalone CI/gate, package metadata, progressive context, and honest
   capability documentation.
 - [x] Mutation-probe the upload authorization default test and restore it.
-- [x] Land and push the standalone commits; GitHub CI is green.
-- [x] Pin the child as `packages/cde` in the integration superproject and pass
-  the root gate at the selected child revision.
+- [x] Correct optional/non-null fidelity, enforce Documents object-closure rules,
+  and redact credential-bearing `Debug` output.
+- [x] Land and push the initial standalone implementation; initial GitHub CI was green.
+- [x] Pin the initial child as `packages/cde` in the integration superproject and
+  pass the root gate at that revision.
+- [ ] Push the audit remediation and update/revalidate the parent gitlink.
 
 ### Evidence
 
-- `openapi-spec-validator swagger.yaml` — structurally valid Swagger/OpenAPI 2.0.
-- Fresh remote clone `scripts/gate.sh` — fmt, build, 7 tests, Clippy, rustdoc,
-  and package verification passed.
-- `cargo package -p openbim-cde` — 11 files, 32.4 KiB; no standards PDFs.
+- `openapi-spec-validator swagger.yaml` — structurally valid OpenAPI 3.0.
+- Current standalone `scripts/gate.sh` — fmt, locked build, 15 tests, Clippy,
+  rustdoc, and package verification passed.
+- `cargo package -p openbim-cde` — 12 files, 52.5 KiB; attribution included and
+  no standards PDFs.
 - Parent `scripts/gate.sh` — workspace/feature/isolation/submodule gates passed,
   including `isolated build -p openbim-cde`.
