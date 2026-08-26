@@ -36,7 +36,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   and multipart framing from `Debug`; keep registered client secrets in zeroizing
   wire owners, reject registration JSON escapes before non-zeroizing Serde scratch,
   and keep each non-success body in one bounded, zeroizing explicit diagnostic.
-- Require HTTPS by default, disable redirects, isolate credentials by origin, and
+- Require HTTPS by default, disable redirects and ambient proxy discovery, isolate
+  credentials by origin, treat only an explicitly configured proxy as trusted, and
   enforce exact success media types/statuses and bounded bodies.
 - Require S256 PKCE and state, reject ambiguous callbacks/endpoints, rotate refresh
   tokens with compare-and-swap, zeroize controlled secret allocations, reject

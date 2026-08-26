@@ -34,6 +34,8 @@ openbim-cde-validation/  # raw JSON schema/OpenAPI validation
 - Cover all Foundation methods and every Documents OpenAPI operation.
 - Accept Documents URLs advertised by the server; never send literal `server-provided-path-*` placeholders.
 - Expose explicit timeout, maximum-body, TLS, proxy, and user-agent policy.
+- Ignore ambient proxy environment variables; only an explicit `proxy` builder call
+  makes a proxy part of the caller's credential trust boundary.
 - Disable redirects by default so bearer tokens, Basic credentials, signed URLs, and upload headers cannot cross origins.
 - Reject cleartext credential transport unless a test-only/local-development policy explicitly permits it.
 - Retain each non-success body only once in a bounded, zeroizing diagnostic;

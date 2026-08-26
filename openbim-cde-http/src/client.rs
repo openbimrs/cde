@@ -280,6 +280,10 @@ impl HttpClientBuilder {
     }
 
     /// Configure an explicit HTTP proxy.
+    ///
+    /// Ambient proxy environment variables are ignored. An explicitly configured
+    /// proxy is part of the caller's trust boundary and can receive authorization
+    /// headers and, for loopback-development HTTP, cleartext traffic.
     pub fn proxy(mut self, url: impl AsRef<str>) -> Result<Self, crate::ConfigError> {
         self.proxy = Some(
             reqwest::Proxy::all(url.as_ref())
@@ -303,9 +307,14 @@ impl HttpClientBuilder {
             .connect_timeout(self.connect_timeout)
             .timeout(self.request_timeout)
             .user_agent(&self.user_agent);
-        if let Some(proxy) = self.proxy {
-            builder = builder.proxy(proxy);
-        }
+        builder = if let Some(proxy) = self.proxy {
+            builder.proxy(proxy)
+        } else {
+            // Ambient proxy variables are outside the caller's configured trust
+            // boundary and could receive authorization, including credentials on
+            // the explicit loopback-only cleartext development path.
+            builder.no_proxy()
+        };
         let inner = builder
             .build()
             .map_err(|_| crate::ConfigError::new("failed to build HTTP client"))?;

@@ -3,9 +3,12 @@
 Hardened, executable HTTP adapters for the buildingSMART Foundation API 1.1 and
 Documents API 1.0 wire models in [`openbim-cde`](../openbim-cde).
 
-The client requires HTTPS by default, disables redirects, bounds all buffered
-bodies, validates response content types, redacts credentials, and only sends
-authorization to another origin when an explicit policy permits it. Documents
+The client requires HTTPS by default, disables redirects and ambient proxy
+environment variables, bounds all buffered bodies, validates response content
+types, redacts credentials, and only sends authorization to another origin when
+an explicit policy permits it. `HttpClientBuilder::proxy` is the sole proxy
+opt-in; that proxy becomes part of the caller's credential trust boundary.
+Documents
 hypermedia methods use exact absolute URLs advertised by the CDE. Non-success
 bodies are retained only in one bounded, zeroizing `Diagnostic`; ordinary
 callers must invoke `Diagnostic::expose_untrusted` to read server-controlled text.

@@ -16,9 +16,16 @@ use openbim_cde::{
 };
 use openbim_cde_http::{Credential, HttpClientBuilder, HttpError, UploadSource};
 use serde_json::json;
-use std::sync::{
-    atomic::{AtomicUsize, Ordering},
-    Arc,
+use std::{
+    io::{Read, Write},
+    net::TcpListener,
+    process::Command,
+    sync::{
+        atomic::{AtomicUsize, Ordering},
+        Arc,
+    },
+    thread,
+    time::{Duration, Instant},
 };
 use zeroize::Zeroize;
 
@@ -37,6 +44,139 @@ fn local_client(base: &str) -> HttpClientBuilder {
     )
     .unwrap()
     .allow_http_for_local_development()
+}
+
+fn capture_one_http_request(listener: TcpListener) -> Vec<u8> {
+    listener.set_nonblocking(true).unwrap();
+    let deadline = Instant::now() + Duration::from_secs(2);
+    while Instant::now() < deadline {
+        match listener.accept() {
+            Ok((mut stream, _)) => {
+                stream
+                    .set_read_timeout(Some(Duration::from_secs(1)))
+                    .unwrap();
+                let mut request = Vec::new();
+                let mut chunk = [0_u8; 4096];
+                while request.len() < 16 * 1024 {
+                    match stream.read(&mut chunk) {
+                        Ok(0) => break,
+                        Ok(count) => {
+                            request.extend_from_slice(&chunk[..count]);
+                            if request.windows(4).any(|window| window == b"\r\n\r\n") {
+                                break;
+                            }
+                        }
+                        Err(error)
+                            if matches!(
+                                error.kind(),
+                                std::io::ErrorKind::WouldBlock | std::io::ErrorKind::TimedOut
+                            ) =>
+                        {
+                            break;
+                        }
+                        Err(error) => panic!("failed to capture request: {error}"),
+                    }
+                }
+                let body = br#"{"id":"proxy-test-user","name":null}"#;
+                let response = format!(
+                    "HTTP/1.1 200 OK\r\ncontent-type: application/json\r\ncontent-length: {}\r\nconnection: close\r\n\r\n",
+                    body.len()
+                );
+                stream.write_all(response.as_bytes()).unwrap();
+                stream.write_all(body).unwrap();
+                return request;
+            }
+            Err(error) if error.kind() == std::io::ErrorKind::WouldBlock => {
+                thread::sleep(Duration::from_millis(10));
+            }
+            Err(error) => panic!("failed to accept request: {error}"),
+        }
+    }
+    Vec::new()
+}
+
+#[tokio::test]
+async fn ambient_proxy_child_request() {
+    if std::env::var_os("OPENCDE_AMBIENT_PROXY_CHILD").as_deref() != Some("1".as_ref()) {
+        return;
+    }
+    let base = std::env::var("OPENCDE_AMBIENT_PROXY_TARGET").unwrap();
+    let builder = local_client(&base)
+        .connect_timeout(Duration::from_secs(2))
+        .request_timeout(Duration::from_secs(3))
+        .credential(Credential::bearer("ambient-proxy-test-marker"));
+    let builder = match std::env::var("OPENCDE_EXPLICIT_PROXY") {
+        Ok(proxy) => builder.proxy(proxy).unwrap(),
+        Err(_) => builder,
+    };
+    let user = builder.build().unwrap().current_user().await.unwrap();
+    assert_eq!(user.id, "proxy-test-user");
+}
+
+#[test]
+fn ambient_proxy_variables_cannot_intercept_loopback_credentials() {
+    let target_listener = TcpListener::bind("127.0.0.1:0").unwrap();
+    let target = format!("http://{}", target_listener.local_addr().unwrap());
+    let proxy_listener = TcpListener::bind("127.0.0.1:0").unwrap();
+    let proxy = format!("http://{}", proxy_listener.local_addr().unwrap());
+    let target_capture = thread::spawn(move || capture_one_http_request(target_listener));
+    let proxy_capture = thread::spawn(move || capture_one_http_request(proxy_listener));
+
+    let output = Command::new(std::env::current_exe().unwrap())
+        .args(["--exact", "ambient_proxy_child_request"])
+        .env("OPENCDE_AMBIENT_PROXY_CHILD", "1")
+        .env("OPENCDE_AMBIENT_PROXY_TARGET", &target)
+        .env("HTTP_PROXY", &proxy)
+        .env("http_proxy", &proxy)
+        .env("ALL_PROXY", &proxy)
+        .env("all_proxy", &proxy)
+        .env_remove("NO_PROXY")
+        .env_remove("no_proxy")
+        .output()
+        .unwrap();
+    assert!(output.status.success(), "proxy-isolation child failed");
+
+    let target_request = String::from_utf8(target_capture.join().unwrap()).unwrap();
+    let proxy_request = proxy_capture.join().unwrap();
+    assert!(
+        proxy_request.is_empty(),
+        "ambient proxy intercepted request"
+    );
+    assert!(target_request
+        .to_ascii_lowercase()
+        .contains("authorization: bearer ambient-proxy-test-marker"));
+}
+
+#[test]
+fn explicit_proxy_remains_an_intentional_caller_decision() {
+    let target_listener = TcpListener::bind("127.0.0.1:0").unwrap();
+    let target = format!("http://{}", target_listener.local_addr().unwrap());
+    let proxy_listener = TcpListener::bind("127.0.0.1:0").unwrap();
+    let proxy = format!("http://{}", proxy_listener.local_addr().unwrap());
+    let target_capture = thread::spawn(move || capture_one_http_request(target_listener));
+    let proxy_capture = thread::spawn(move || capture_one_http_request(proxy_listener));
+
+    let output = Command::new(std::env::current_exe().unwrap())
+        .args(["--exact", "ambient_proxy_child_request"])
+        .env("OPENCDE_AMBIENT_PROXY_CHILD", "1")
+        .env("OPENCDE_AMBIENT_PROXY_TARGET", &target)
+        .env("OPENCDE_EXPLICIT_PROXY", &proxy)
+        .env_remove("HTTP_PROXY")
+        .env_remove("http_proxy")
+        .env_remove("ALL_PROXY")
+        .env_remove("all_proxy")
+        .env_remove("NO_PROXY")
+        .env_remove("no_proxy")
+        .output()
+        .unwrap();
+    assert!(output.status.success(), "explicit-proxy child failed");
+
+    let target_request = target_capture.join().unwrap();
+    let proxy_request = String::from_utf8(proxy_capture.join().unwrap()).unwrap();
+    assert!(target_request.is_empty(), "explicit proxy was bypassed");
+    assert!(proxy_request
+        .to_ascii_lowercase()
+        .contains("authorization: bearer ambient-proxy-test-marker"));
 }
 
 #[test]
