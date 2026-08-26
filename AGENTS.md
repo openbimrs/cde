@@ -25,4 +25,5 @@ openCDE API family.
 - Keep capability claims separated into implemented, conformance-tested, and
   planned.
 
-Run `./scripts/gate.sh`; trust command exit codes.
+Run `./scripts/gate.sh` and `cargo deny --all-features check advisories licenses bans sources`;
+trust command exit codes.

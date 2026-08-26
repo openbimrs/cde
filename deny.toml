@@ -25,13 +25,28 @@ deny = [
 # crates still require syn 2. ring 0.17 pins windows-sys 0.52 while Tokio
 # and platform certificate code use windows-sys 0.61. oauth2/rand/ring retain
 # getrandom 0.2 while validation's ahash uses 0.3. oauth2 retains thiserror 1
-# while the Reqwest platform verifier's JNI path requires thiserror 2.
+# while the Reqwest platform verifier's JNI path requires thiserror 2. The
+# optional native credential store spans two Core Foundation/security-framework
+# generations on macOS and windows-targets 0.52/0.53 plus windows-sys 0.60/0.61.
+# Every target-family exception below pins only the older unavoidable version.
 skip = [
+  { name = "core-foundation", version = "=0.9.4" },
   { name = "getrandom", version = "=0.2.17" },
+  { name = "security-framework", version = "=2.11.1" },
   { name = "syn", version = "=3.0.4" },
   { name = "thiserror", version = "=1.0.69" },
   { name = "thiserror-impl", version = "=1.0.69" },
   { name = "windows-sys", version = "=0.52.0" },
+  { name = "windows-sys", version = "=0.60.2" },
+  { name = "windows-targets", version = "=0.52.6" },
+  { name = "windows_aarch64_gnullvm", version = "=0.52.6" },
+  { name = "windows_aarch64_msvc", version = "=0.52.6" },
+  { name = "windows_i686_gnu", version = "=0.52.6" },
+  { name = "windows_i686_gnullvm", version = "=0.52.6" },
+  { name = "windows_i686_msvc", version = "=0.52.6" },
+  { name = "windows_x86_64_gnu", version = "=0.52.6" },
+  { name = "windows_x86_64_gnullvm", version = "=0.52.6" },
+  { name = "windows_x86_64_msvc", version = "=0.52.6" },
 ]
 
 [sources]
