@@ -4,6 +4,12 @@ set -euo pipefail
 
 cd "$(dirname "$0")/.."
 
+tracked_reference_pdfs=$(git ls-files 'references/*.pdf' 'references/**/*.pdf')
+if [[ -n "$tracked_reference_pdfs" ]]; then
+    printf 'copyrighted reference PDFs must not be tracked:\n%s\n' "$tracked_reference_pdfs" >&2
+    exit 1
+fi
+
 if ! cmp -s LICENSE openbim-cde/LICENSE; then
     printf 'crate and repository license files differ\n' >&2
     exit 1
@@ -44,7 +50,7 @@ while IFS= read -r package_file; do
     esac
 done <<<"$package_files"
 case "$package_files" in
-    *"references/schema/"*)
+    *"references/"*)
         printf 'package contains forbidden standards material\n' >&2
         exit 1
         ;;

@@ -50,7 +50,23 @@ families.
 - [x] Land and push the initial standalone implementation; initial GitHub CI was green.
 - [x] Pin the initial child as `packages/cde` in the integration superproject and
   pass the root gate at that revision.
-- [ ] Push the audit remediation and update/revalidate the parent gitlink.
+- [x] Push the audit remediation and update/revalidate the parent gitlink.
+
+## Phase 2: executable protocol stack
+
+Architecture and acceptance criteria live in
+[`docs/phase-2-architecture.md`](docs/phase-2-architecture.md).
+
+- [x] Audit Foundation/Documents HTTP operations, OAuth semantics, validation
+  dialects, dependency options, and crate boundaries.
+- [x] Preserve the moved local DIN corpus and mutation-verify a directory-agnostic
+  tracked-PDF guard.
+- [ ] Add `openbim-cde-http` with hardened client and configurable server adapters.
+- [ ] Add `openbim-cde-oauth` with PKCE, refresh rotation, legacy-flow policy,
+  memory storage, and optional native keyring persistence.
+- [ ] Add `openbim-cde-validation` with external-schema identity checks,
+  Draft-3/OpenAPI normalization, and complete raw-payload validation.
+- [ ] Mutation-test, independently review, land, and advance the parent gitlink.
 
 ### Evidence
 

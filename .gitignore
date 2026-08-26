@@ -1,4 +1,5 @@
-# Copyrighted standards kept as local research material only.
-references/schema/*.pdf
+# Copyrighted standards kept as local research material only. Keep this broad
+# so moving the local corpus cannot accidentally expose licensed PDFs to Git.
+references/**/*.pdf
 
 /target/

@@ -9,7 +9,10 @@ API 1.0.
 - Preserve the wire vocabulary with `serde(rename_all = "snake_case")`.
 - Required schema properties use non-`Option` fields; nullable or optional
   properties use `Option`.
-- Do not use `deny_unknown_fields`: Foundation API 1.1 requires clients and
-  servers to ignore extension properties.
+- Foundation models must not use `deny_unknown_fields`: Foundation API 1.1
+  requires extension tolerance. Documents models follow each component's own
+  `additionalProperties` declaration.
+- Keep HTTP, OAuth, persistence, and schema-engine dependencies out of this
+  crate; sibling crates own executable protocol behavior.
 - Keep URLs and RFC 3339 date-times as strings unless validation is explicit;
   parsing them implicitly would reject otherwise round-trippable payloads.
