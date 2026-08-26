@@ -15,6 +15,14 @@ machine-readable contracts are split across repositories.
 | [BCF API 3.0](https://github.com/buildingSMART/BCF-API/tree/release_3_0) | Separate standard API | Its own schemas | `openbim-bcf` boundary |
 | [Dictionary API](https://app.swaggerhub.com/apis/buildingSMART/Dictionaries/v1) | Separate portfolio API | SwaggerHub contract | Future dedicated package |
 
+The Foundation repository itself is the current source family, not the obsolete
+umbrella repository. Its default `master` branch has continued to evolve after
+the pinned 1.1 release and currently includes PKCE-related discovery prose and
+fields, but no newer release branch or tag supersedes `release_1_1`. This
+repository therefore claims released Foundation 1.1 compatibility only. The
+OAuth adapter requires PKCE as a security policy without presenting unreleased
+`master` additions as normative 1.1 wire fields.
+
 Exact commits and SHA-256 hashes are locked in
 [`references/upstream-sources.toml`](../references/upstream-sources.toml).
 Upstream schemas are not copied into this repository because the inspected

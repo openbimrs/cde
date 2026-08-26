@@ -62,3 +62,4 @@ case "$package_files" in
         ;;
 esac
 cargo package -p openbim-cde --locked --allow-dirty
+python3 scripts/check-packages.py

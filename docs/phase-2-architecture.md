@@ -53,7 +53,7 @@ Documents deliberately publishes server-provided URLs. Router paths are therefor
 
 - Execute Authorization Code Grant with mandatory PKCE and state verification.
 - Execute refresh-token rotation and Resource Owner Password Credentials only when explicitly advertised and enabled as a legacy compatibility policy.
-- Parse Foundation discovery and dynamic registration contracts.
+- Explicitly reject Implicit and Client Credentials execution; Foundation 1.1 excl...[truncated]
 - Model access, refresh, client, and PKCE secrets with redacted diagnostics and zeroization-capable storage.
 - Define an async, generation-aware `TokenStore` so refresh rotation cannot silently overwrite a newer token in one process.
 - Ship an in-memory implementation for tests/ephemeral services.
