@@ -26,8 +26,9 @@ Required properties are required Rust fields. Optional, non-null properties use
 explicitly nullable use `Option<T>`. Closed wire enums are Rust enums. Foundation
 objects accept extensions; Documents objects enforce each schema's declared
 `additionalProperties` policy.
-Client secrets, dynamic-registration browser/client URLs, upload URLs, multipart
-framing, and HTTP header values redact their `Debug` representations.
+Client secrets redact their `Debug` representation, zeroize owned values on drop,
+and reject copied/escaped deserialization paths that cannot preserve the zeroizing
+ownership boundary.
 
 This crate does **not** execute HTTP requests, OAuth flows, file transfers, or
 full JSON Schema validation. See the repository

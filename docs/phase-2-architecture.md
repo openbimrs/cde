@@ -1,6 +1,6 @@
 # Phase 2: executable OpenCDE protocol stack
 
-**Status:** accepted for implementation
+**Status:** implementation candidate; release gates and exact-tree review required
 **Wire baseline:** `openbim-cde` 0.1, buildingSMART Foundation API 1.1 and Documents API 1.0
 
 ## Goal
@@ -36,7 +36,13 @@ openbim-cde-validation/  # raw JSON schema/OpenAPI validation
 - Expose explicit timeout, maximum-body, TLS, proxy, and user-agent policy.
 - Disable redirects by default so bearer tokens, Basic credentials, signed URLs, and upload headers cannot cross origins.
 - Reject cleartext credential transport unless a test-only/local-development policy explicitly permits it.
-- Decode released error payloads while retaining status and bounded diagnostic bytes for nonstandard servers.
+- Retain each non-success body only once in a bounded, zeroizing diagnostic;
+  callers must explicitly expose untrusted server text, and no ordinary parsed
+  error-message copy is kept.
+- Reject JSON escapes in successful dynamic-registration responses before Serde;
+  its escape-decoding scratch is not zeroizing.
+- Store dynamically registered client secrets in zeroizing wire owners with
+  redacted diagnostics.
 - Stream document bodies; do not buffer unbounded files.
 
 ### Server
@@ -53,13 +59,15 @@ Documents deliberately publishes server-provided URLs. Router paths are therefor
 
 - Execute Authorization Code Grant with mandatory PKCE and state verification.
 - Execute refresh-token rotation and Resource Owner Password Credentials only when explicitly advertised and enabled as a legacy compatibility policy.
-- Explicitly reject Implicit and Client Credentials execution; Foundation 1.1 excl...[truncated]
+- Explicitly reject Implicit and Client Credentials execution; Foundation 1.1 does not advertise Client Credentials, and Implicit cannot meet the required redirect/secret policy.
 - Model access, refresh, client, and PKCE secrets with redacted diagnostics and zeroization-capable storage.
 - Define an async, generation-aware `TokenStore` so refresh rotation cannot silently overwrite a newer token in one process.
 - Ship an in-memory implementation for tests/ephemeral services.
-- Ship native credential-store persistence behind an opt-in feature pinned to an MSRV-compatible keyring release.
+- Ship native credential-store persistence behind an opt-in feature pinned to an MSRV-compatible keyring release; preflight the complete persisted payload before base64/JSON allocation, reject escaped JSON, and decode malformed base64 only into zeroizing scratch.
 - Never provide plaintext file persistence.
 - Inject bearer authentication into HTTP adapters; OAuth authorization-server/identity-provider implementation is not implied.
+- Bound production Reqwest requests before copying: query-free URI up to 8 KiB,
+  at most 64 headers, 16 KiB per value, 64 KiB aggregate, and a 1 MiB body.
 
 Foundation 1.1 advertises authorization-code, implicit, and resource-owner-password flows. Implicit is recognized for discovery compatibility but is not executed because it cannot meet the required secret/redirect security properties. This rejection is explicit, typed, and documented.
 
@@ -70,10 +78,19 @@ Validation consumes raw JSON plus caller-supplied locked source documents before
 1. Verify optional expected SHA-256 identities.
 2. Normalize Foundation Draft-3 property-level requiredness and type arrays into deterministic Draft-4-compatible schemas.
 3. Normalize OpenAPI 3.0 `nullable`, component references, formats, and object closure into deterministic JSON Schema form.
-4. Disable network/file reference resolution outside the supplied in-memory registry.
-5. Compile once and cache immutable validators.
-6. Return stable JSON-pointer violations with schema keyword and source component.
-7. Deserialize into `openbim-cde` only after raw validation passes.
+4. Reject network/file references outside the supplied in-memory registry.
+5. Enforce byte, node, depth, component, reference-expansion, compiled-wrapper,
+   and violation budgets before and during normalization/validation.
+6. Account and dispose caller-built JSON values iteratively so hostile nesting
+   cannot exhaust the native stack.
+7. Compile immutable validators only after all structural limits pass, without
+   allowing component count to multiply retained schema copies beyond aggregate
+   byte/node budgets.
+8. Return bounded, stable JSON-pointer/keyword violations with categorical
+   messages that never retain rejected instance, reference, or source-version
+   values; check the violation budget before retaining even an unknown-component
+   violation, so a configured zero remains a hard zero.
+9. Deserialize into `openbim-cde` only after raw validation passes.
 
 The validator follows released machine semantics. The known `minLength`-on-array typo is inapplicable to arrays and therefore has no released-schema effect; an optional interoperability policy may enforce the likely intended non-empty array but must label that rule as inferred rather than normative.
 
@@ -81,7 +98,8 @@ The validator follows released machine semantics. The known `minLength`-on-array
 
 ## Dependency decisions
 
-- `reqwest 0.13`: client, rustls, streaming, JSON; MSRV 1.85.
+- `reqwest 0.13`: client with `rustls-no-provider` and an explicit ring provider,
+  streaming, and JSON; MSRV 1.85.
 - `axum 0.8` and `tower`: server adapters; MSRV below 1.85.
 - `oauth2 5.0`: protocol execution with default HTTP client disabled.
 - `secrecy`/`zeroize`: explicit secret boundaries.

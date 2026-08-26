@@ -1,0 +1,45 @@
+[package]
+name = "openbim-cde-http"
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.85"
+license = "MIT"
+authors = ["point-grey"]
+repository = "https://github.com/openbimrs/cde"
+readme = "README.md"
+description = "Hardened HTTP client and server adapters for buildingSMART OpenCDE APIs."
+publish = false
+include = [
+    "src/**/*.rs",
+    "tests/**/*.rs",
+    "LICENSE",
+    "README.md",
+    "THIRD_PARTY_NOTICES.md",
+]
+
+[dependencies]
+async-trait = "=0.1.89"
+axum = { version = "0.8", default-features = false, features = ["http1", "json", "tokio"] }
+base64 = { version = "0.22", default-features = false, features = ["std"] }
+bytes = "1"
+futures-core = { version = "0.3", default-features = false, features = ["std"] }
+futures-util = { version = "0.3", default-features = false, features = ["std"] }
+idna_adapter = "=1.2.0" # MSRV ceiling for url/idna.
+openbim-cde = { version = "=0.1.0", path = "../openbim-cde" }
+reqwest = { version = "=0.13.4", default-features = false, features = ["rustls-no-provider", "json", "query", "stream"] }
+rustls = { version = "0.23", default-features = false, features = ["ring", "std"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+tower = { version = "0.5", default-features = false, features = ["util"] }
+tower-http = { version = "0.6", default-features = false, features = ["limit"] }
+url = "=2.5.4"
+zeroize = { version = "1", features = ["derive"] }
+
+[dev-dependencies]
+axum = { version = "0.8", features = ["json", "http1", "tokio"] }
+tokio = { version = "1", features = ["macros", "net", "rt-multi-thread", "time", "io-util"] }
+tower = { version = "0.5", features = ["util"] }
+
+[lints.rust]
+unsafe_code = "forbid"
+missing_docs = "warn"

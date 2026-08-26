@@ -6,7 +6,12 @@
 
 use crate::OptionalNonNull;
 use core::fmt;
-use serde::{Deserialize, Serialize};
+use serde::{
+    de::{Deserializer, Visitor},
+    ser::Serializer,
+    Deserialize, Serialize,
+};
+use zeroize::{ZeroizeOnDrop, Zeroizing};
 
 /// Fixed discovery path, independent of any advertised Foundation base URL.
 pub const VERSIONS_PATH: &str = "/foundation/versions";
@@ -125,21 +130,65 @@ impl fmt::Debug for DynamicClientRegistrationResponse {
 }
 
 /// A client secret whose `Debug` representation cannot disclose its value.
-#[derive(Clone, PartialEq, Eq, Serialize, Deserialize)]
-#[serde(transparent)]
-pub struct ClientSecret(String);
+#[derive(Clone, PartialEq, Eq)]
+pub struct ClientSecret(Zeroizing<String>);
 
 impl ClientSecret {
     /// Construct a secret from its wire value.
     #[must_use]
     pub fn new(value: impl Into<String>) -> Self {
-        Self(value.into())
+        Self(Zeroizing::new(value.into()))
     }
 
     /// Explicitly expose the secret for authentication use.
     #[must_use]
     pub fn expose_secret(&self) -> &str {
         &self.0
+    }
+}
+
+impl ZeroizeOnDrop for ClientSecret {}
+
+impl Serialize for ClientSecret {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        serializer.serialize_str(&self.0)
+    }
+}
+
+impl<'de> Deserialize<'de> for ClientSecret {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: Deserializer<'de>,
+    {
+        deserializer.deserialize_string(ClientSecretVisitor)
+    }
+}
+
+struct ClientSecretVisitor;
+
+impl Visitor<'_> for ClientSecretVisitor {
+    type Value = ClientSecret;
+
+    fn expecting(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
+        formatter.write_str("a client secret string")
+    }
+
+    fn visit_borrowed_str<E>(self, value: &'_ str) -> Result<Self::Value, E> {
+        Ok(ClientSecret::new(value))
+    }
+
+    fn visit_str<E>(self, _value: &str) -> Result<Self::Value, E>
+    where
+        E: serde::de::Error,
+    {
+        Err(E::custom("copied client secret strings are not supported"))
+    }
+
+    fn visit_string<E>(self, value: String) -> Result<Self::Value, E> {
+        Ok(ClientSecret(Zeroizing::new(value)))
     }
 }
 

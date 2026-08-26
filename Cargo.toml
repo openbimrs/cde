@@ -1,6 +1,11 @@
 [workspace]
 resolver = "2"
-members = ["openbim-cde"]
+members = [
+  "openbim-cde",
+  "openbim-cde-http",
+  "openbim-cde-oauth",
+  "openbim-cde-validation",
+]
 
 [profile.release]
 opt-level = 3

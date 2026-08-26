@@ -4,7 +4,11 @@ ignore = []
 [licenses]
 allow = [
   "Apache-2.0",
+  "BSD-3-Clause",
+  "CDLA-Permissive-2.0",
+  "ISC",
   "MIT",
+  "MIT-0",
   "Unicode-3.0",
 ]
 confidence-threshold = 0.8
@@ -13,6 +17,22 @@ confidence-threshold = 0.8
 multiple-versions = "deny"
 wildcards = "deny"
 highlight = "all"
+deny = [
+  { name = "aws-lc-rs", reason = "OpenCDE TLS uses rustls-no-provider with explicit ring; AWS-LC/CMake is outside the supported build and audit boundary" },
+  { name = "aws-lc-sys", reason = "OpenCDE TLS uses rustls-no-provider with explicit ring; AWS-LC/CMake is outside the supported build and audit boundary" },
+]
+# syn 3 is pulled by current serde/tokio while transitive platform/proc-macro
+# crates still require syn 2. ring 0.17 pins windows-sys 0.52 while Tokio
+# and platform certificate code use windows-sys 0.61. oauth2/rand/ring retain
+# getrandom 0.2 while validation's ahash uses 0.3. oauth2 retains thiserror 1
+# while the Reqwest platform verifier's JNI path requires thiserror 2.
+skip = [
+  { name = "getrandom", version = "=0.2.17" },
+  { name = "syn", version = "=3.0.4" },
+  { name = "thiserror", version = "=1.0.69" },
+  { name = "thiserror-impl", version = "=1.0.69" },
+  { name = "windows-sys", version = "=0.52.0" },
+]
 
 [sources]
 unknown-registry = "deny"

@@ -1,6 +1,7 @@
 # OpenBIM.rs CDE
 
-Pure-Rust wire contracts for the buildingSMART openCDE API family.
+Pure-Rust wire contracts and hardened runtime adapters for the buildingSMART
+openCDE API family.
 
 [![CI](https://github.com/openbimrs/cde/actions/workflows/ci.yml/badge.svg)](https://github.com/openbimrs/cde/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
@@ -12,24 +13,26 @@ Pure-Rust wire contracts for the buildingSMART openCDE API family.
 | Foundation API 1.1 payloads | Implemented: all 6 released JSON schemas |
 | Documents API 1.0 payloads | Implemented: all 24 named OpenAPI components |
 | Serde JSON read/write | Implemented and tested |
-| Endpoint discovery constants | Implemented |
+| HTTP client/server adapters | Implemented: 4 Foundation and 13 Documents operations |
+| OAuth execution/token storage | Implemented: PKCE/state, refresh rotation, opt-in legacy ROPC |
+| Pinned runtime schema validation | Implemented for applicable assertions in supplied locked sources |
+| Vendor certification / prose-only requirements | Not claimed |
 | crates.io publication | Blocked pending upstream rights clearance |
-| HTTP client/server | Not implemented |
-| OAuth execution/token storage | Not implemented |
-| Full JSON Schema constraint validation | Not implemented |
 | DIN SPEC 91391 interface | Research only; no machine schema found |
 
-The crate is transport-agnostic by design. Applications choose their HTTP,
-async, TLS, OAuth, retry, and observability stacks.
+The `openbim-cde` wire crate remains transport-agnostic. Applications opt into
+the sibling HTTP, OAuth, and validation layers independently; server services
+and authentication policy remain injected by the host application.
 
 ## Workspace
 
 ```text
-openbim-cde/                 Cargo package (publication blocked)
-  src/foundation.rs          Foundation API 1.1 models
-  src/documents.rs           Documents API 1.0 models
-docs/architecture.md         boundaries and wire-fidelity decisions
-docs/schema-audit.md         where the actual schemas are
+openbim-cde/                 dependency-light wire contracts
+openbim-cde-http/            hardened Reqwest clients and Axum adapters
+openbim-cde-oauth/           OAuth execution and token-store providers
+openbim-cde-validation/      bounded external-schema validation
+docs/phase-2-architecture.md runtime boundaries and security invariants
+docs/schema-audit.md         exact upstream discrepancies and normalization
 references/                  source revision/hash evidence only
 scripts/gate.sh              complete standalone verification
 ```
@@ -56,6 +59,11 @@ let response: VersionsResponse = serde_json::from_str(body)?;
 # Ok::<(), serde_json::Error>(())
 ```
 
+Runtime APIs and their security contracts are documented in the crate READMEs:
+[`openbim-cde-http`](openbim-cde-http/README.md),
+[`openbim-cde-oauth`](openbim-cde-oauth/README.md), and
+[`openbim-cde-validation`](openbim-cde-validation/README.md).
+
 ## Schema finding
 
 The archived [`buildingSMART/OpenCDE-API`](https://github.com/buildingSMART/OpenCDE-API)
@@ -74,11 +82,15 @@ See the evidence and the DIN §1/§4.2 tension in
 ./scripts/gate.sh
 ```
 
-The package manifest uses an explicit inclusion boundary. The gate checks
-formatting, locked dependency resolution, all targets, all tests/features,
-Clippy and rustdoc with warnings denied, Cargo packaging, exact package-file
-classes, and inclusion of `THIRD_PARTY_NOTICES.md`. CI additionally runs
-`cargo-deny`.
+Every package manifest uses an explicit inclusion boundary. The gate checks
+formatting, locked dependency resolution, all targets/features, Clippy and
+rustdoc with warnings denied, the exact four-package workspace, exact per-package
+file inventories, `publish = false`, byte-identical licenses, MSRV/edition
+metadata, and notices. Adapter packages are compiled against their real path
+links; `cargo package --list` audits their archives without pretending the
+intentionally unpublished wire dependency exists on crates.io. CI runs
+`cargo-deny` and executes validation against clean checkouts of both exact
+upstream source revisions.
 
 ## Integration
 

@@ -1,6 +1,22 @@
 use openbim_cde::{documents, foundation, OptionalNonNull};
 
 #[test]
+fn foundation_client_secret_zeroizes_on_drop_and_round_trips() {
+    fn assert_zeroize_on_drop<T: zeroize::ZeroizeOnDrop>() {}
+    assert_zeroize_on_drop::<foundation::ClientSecret>();
+
+    let secret: foundation::ClientSecret =
+        serde_json::from_str(r#""registration-secret""#).unwrap();
+    assert_eq!(secret.expose_secret(), "registration-secret");
+    assert_eq!(
+        serde_json::to_string(&secret).unwrap(),
+        r#""registration-secret""#
+    );
+    let escaped = serde_json::from_str::<foundation::ClientSecret>(r#""registrat\u0069on-secret""#);
+    assert!(escaped.is_err());
+}
+
+#[test]
 fn foundation_versions_accepts_nullable_entries_and_extensions() {
     let body = r#"{
         "versions": [

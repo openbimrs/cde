@@ -5,7 +5,10 @@ openCDE API family.
 
 ## Map
 
-- `openbim-cde/` — published crate; read its `AGENTS.md` before editing
+- `openbim-cde/` — dependency-light wire contracts; read its `AGENTS.md`
+- `openbim-cde-http/` — hardened reqwest client and Axum adapters
+- `openbim-cde-oauth/` — OAuth execution and secure token stores
+- `openbim-cde-validation/` — external-schema normalization and validation
 - `docs/` — maintained architecture and source research
 - `references/` — source lock and local-only copyrighted standards
 - `scripts/gate.sh` — standalone verification gate
