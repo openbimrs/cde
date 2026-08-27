@@ -3,3 +3,8 @@
 references/**/*.pdf
 
 /target/
+
+# Ad-hoc `git worktree add .worktrees/<name>` scratch space for review/gate
+# candidates. Never commit — these are throwaway checkouts of already-tracked
+# refs, cleaned up with `git worktree remove` when done.
+/.worktrees/
