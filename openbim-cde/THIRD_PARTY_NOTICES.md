@@ -14,7 +14,7 @@ definitions requires permission. Therefore Cargo publication is disabled with
 clearance.
 
 This notice records provenance and attribution; it is not a license grant for
-third-party material. The repository's MIT license applies only to original
+third-party material. The repository's AGPL-3.0-or-later license applies only to original
 OpenBIM.rs contributions to the extent those contributions are licensable by
 its authors.
 

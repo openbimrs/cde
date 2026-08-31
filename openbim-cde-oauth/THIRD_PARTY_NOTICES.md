@@ -29,5 +29,5 @@ transitive platform dependencies. See
 the resolved `Cargo.lock` and each package's distributed license metadata for
 the exact dependency graph and license terms.
 
-The repository MIT license applies only to original OpenBIM.rs contributions to
+The repository AGPL-3.0-or-later license applies only to original OpenBIM.rs contributions to
 the extent those contributions are licensable by their authors.

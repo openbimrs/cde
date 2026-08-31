@@ -122,6 +122,6 @@ borrowed API, destruction of that value remains the caller's responsibility.
 
 ## License and provenance
 
-MIT covers the original Rust implementation. Upstream API schemas retain their
+AGPL-3.0-or-later covers the original Rust implementation. Upstream API schemas retain their
 respective rights and are never redistributed here. See
 [`THIRD_PARTY_NOTICES.md`](THIRD_PARTY_NOTICES.md).

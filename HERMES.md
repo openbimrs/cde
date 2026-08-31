@@ -13,7 +13,7 @@ Run `./scripts/gate.sh`. It is the authoritative local and CI gate.
 
 ## Conventions
 
-- Rust 2021, MSRV 1.85, MIT, pure Rust.
+- Rust 2021, MSRV 1.85, AGPL-3.0-or-later, pure Rust.
 - The crate models buildingSMART Foundation API 1.1 and Documents API 1.0.
 - DIN SPEC 91391 is research context, not a substitute machine schema.
 - Do not vendor copyrighted standards or upstream schemas without a license.

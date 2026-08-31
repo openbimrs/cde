@@ -37,7 +37,7 @@ and [schema audit](https://github.com/openbimrs/cde/blob/main/docs/schema-audit.
 
 ## License and publication status
 
-MIT applies to the original Rust implementation. Standards and upstream schemas
+AGPL-3.0-or-later applies to the original Rust implementation. Standards and upstream schemas
 retain their respective rights and are not redistributed in this crate. The
 package has `publish = false` pending upstream rights clearance; exact source
 attribution ships in [`THIRD_PARTY_NOTICES.md`](THIRD_PARTY_NOTICES.md).

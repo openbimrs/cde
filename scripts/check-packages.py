@@ -12,6 +12,7 @@ COMMON = {
     "Cargo.toml",
     "Cargo.toml.orig",
     "LICENSE",
+    "LICENSES/MIT.txt",
     "README.md",
     "THIRD_PARTY_NOTICES.md",
 }
@@ -62,7 +63,7 @@ EXPECTED = {
         "tests/synthetic.rs",
     },
 }
-REQUIRED = {"LICENSE", "README.md", "THIRD_PARTY_NOTICES.md"}
+REQUIRED = {"LICENSE", "LICENSES/MIT.txt", "README.md", "THIRD_PARTY_NOTICES.md"}
 
 def run(*args: str) -> str:
     return subprocess.run(args, cwd=ROOT, check=True, text=True, stdout=subprocess.PIPE).stdout
@@ -89,8 +90,8 @@ for name, expected_files in EXPECTED.items():
         failures.append(f"{name}: edition must remain 2021")
     if package["rust_version"] != "1.85":
         failures.append(f"{name}: rust-version must remain 1.85")
-    if package["license"] != "MIT":
-        failures.append(f"{name}: license metadata must remain MIT")
+    if package["license"] != "AGPL-3.0-or-later":
+        failures.append(f"{name}: license metadata must be AGPL-3.0-or-later")
     if not (crate_dir / "LICENSE").is_file():
         failures.append(f"{name}: LICENSE is missing")
     elif (crate_dir / "LICENSE").read_bytes() != (ROOT / "LICENSE").read_bytes():

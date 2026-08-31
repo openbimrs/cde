@@ -4,7 +4,7 @@ Pure-Rust wire contracts and hardened runtime adapters for the buildingSMART
 openCDE API family.
 
 [![CI](https://github.com/openbimrs/cde/actions/workflows/ci.yml/badge.svg)](https://github.com/openbimrs/cde/actions/workflows/ci.yml)
-[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![License: AGPL-3.0-or-later](https://img.shields.io/badge/license-AGPL--3.0--or--later-blue.svg)](LICENSE)
 
 ## Scope
 
@@ -102,7 +102,7 @@ the superproject pin advances.
 
 ## License
 
-MIT applies to original Rust code. Upstream schema files and locally licensed
+AGPL-3.0-or-later applies to original Rust code. Upstream schema files and locally licensed
 DIN PDFs are not redistributed. The upstream repositories expose no explicit
 schema license, so publication remains mechanically disabled pending rights
 clearance. See `openbim-cde/THIRD_PARTY_NOTICES.md`.

@@ -11,7 +11,7 @@ The inspected Foundation API and Documents API repositories did not contain an
 explicit license grant for their machine-readable contracts. This package is
 therefore marked `publish = false` pending written permission or legal
 clearance. This notice is attribution, not a license grant for third-party
-material. The repository MIT license applies only to original OpenBIM.rs work.
+material. The repository AGPL-3.0-or-later license applies only to original OpenBIM.rs work.
 
 ## Runtime source provenance used by optional integration tests
 
@@ -36,7 +36,7 @@ material. The repository MIT license applies only to original OpenBIM.rs work.
 
 Direct dependencies are used under their upstream licenses:
 
-- `openbim-cde` — MIT (path dependency)
+- `openbim-cde` — AGPL-3.0-or-later (path dependency)
 - `jsonschema` 0.29.1 — MIT; default HTTP/file resolver features disabled
 - `sha2` 0.10 — MIT OR Apache-2.0
 - `base64` 0.22 — MIT OR Apache-2.0

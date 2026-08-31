@@ -3,7 +3,7 @@ name = "openbim-cde"
 version = "0.1.0"
 edition = "2021"
 rust-version = "1.85"
-license = "MIT"
+license = "AGPL-3.0-or-later"
 authors = ["point-grey"]
 repository = "https://github.com/openbimrs/cde"
 readme = "README.md"
@@ -13,6 +13,7 @@ include = [
     "LICENSE",
     "README.md",
     "THIRD_PARTY_NOTICES.md",
+    "LICENSES/MIT.txt",
 ]
 description = "buildingSMART openCDE Foundation and Documents API wire contracts."
 publish = false
