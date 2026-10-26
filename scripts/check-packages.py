@@ -88,8 +88,8 @@ for name, expected_files in EXPECTED.items():
         failures.append(f"{name}: publication must remain disabled")
     if package["edition"] != "2021":
         failures.append(f"{name}: edition must remain 2021")
-    if package["rust_version"] != "1.85":
-        failures.append(f"{name}: rust-version must remain 1.85")
+    if package["rust_version"] != "1.99":
+        failures.append(f"{name}: rust-version must remain 1.99")
     if package["license"] != "AGPL-3.0-or-later":
         failures.append(f"{name}: license metadata must be AGPL-3.0-or-later")
     if not (crate_dir / "LICENSE").is_file():

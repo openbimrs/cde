@@ -196,6 +196,8 @@ impl fmt::Display for TransportError {
 impl Error for TransportError {}
 
 /// Injected async HTTP boundary used for all credential-bearing requests.
+// async-trait marks the boxed future `#[must_use]`; clippy flags its own expansion.
+#[allow(clippy::double_must_use)]
 #[async_trait]
 pub trait OAuthHttpTransport: Send + Sync {
     /// Executes one OAuth HTTP request without following redirects.

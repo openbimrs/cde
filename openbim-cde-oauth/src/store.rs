@@ -103,6 +103,8 @@ impl Error for StoreError {}
 ///
 /// `compare_and_swap` is the only mutation operation. `expected = None` is a
 /// create-only operation; `Some(generation)` updates exactly that generation.
+// async-trait marks the boxed future `#[must_use]`; clippy flags its own expansion.
+#[allow(clippy::double_must_use)]
 #[async_trait]
 pub trait TokenStore: Send + Sync {
     /// Load the current token and generation.

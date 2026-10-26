@@ -118,7 +118,7 @@ All are subject to `cargo-deny`, exact lockfile resolution, default-feature revi
 - OAuth tests against a deterministic local token endpoint: state/PKCE, refresh rotation, failure preservation, and redaction.
 - Validation tests for every keyword present in the pinned sources plus local differential checks against the exact external corpus.
 - Mutation probes for redirect policy, HTTP opt-in, body limits, state verification, token CAS, redaction, remote-ref rejection, requiredness, bounds, patterns, formats, enums, arrays, and object closure.
-- Rust 1.85 and stable full gates, cargo-deny, package allowlists, independent exact-tree review, fresh recursive parent clone, and parent CI.
+- The Rust 1.99.1 full gate, cargo-deny, package allowlists, independent exact-tree review, fresh recursive parent clone, and parent CI.
 
 ## Rollback
 

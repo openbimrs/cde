@@ -10,6 +10,8 @@ use openbim_cde::documents::{
 };
 
 /// Object-safe asynchronous implementation of all thirteen Documents operations.
+// async-trait marks the boxed future `#[must_use]`; clippy flags its own expansion.
+#[allow(clippy::double_must_use)]
 #[async_trait]
 pub trait DocumentsService: Send + Sync {
     /// Standard select-documents POST.

@@ -15,6 +15,6 @@ fragments and Documents API 1.0 OpenAPI documents.
   keyword.
 - Add a synthetic regression before changing behavior. External-corpus tests may
   load `OPENCDE_REFERENCE_ROOT` but must remain runnable without that checkout.
-- Rust 2021, MSRV 1.85, no unsafe code, `publish = false`.
-- Run format, test, clippy with `-D warnings`, and rustdoc warnings on both stable
-  and Rust 1.85 using targets outside the repository.
+- Rust 2021, MSRV 1.99, no unsafe code, `publish = false`.
+- Run format, test, clippy with `-D warnings`, and rustdoc warnings on Rust 1.99.1
+  using targets outside the repository.

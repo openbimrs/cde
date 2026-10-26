@@ -73,7 +73,6 @@ pub struct Download {
 
 impl Download {
     /// Consume the download and return its bounded byte stream.
-    #[must_use]
     pub fn into_stream(
         self,
     ) -> Pin<Box<dyn Stream<Item = Result<Bytes, HttpError>> + Send + 'static>> {

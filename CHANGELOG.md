@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Raise MSRV to Rust 1.99.
 - Relicensed repository-authored work from MIT to `AGPL-3.0-or-later`; historical releases remain under their published MIT terms, and third-party material retains its own terms.
 
 ### Added
@@ -31,7 +32,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `openbim-cde-validation` runtime evaluation of exact caller-supplied pinned
   Foundation and Documents schemas with version-specific normalization.
 - CI checkout and execution of the exact external Foundation/Documents corpus on
-  Rust 1.85.0 and current stable.
+  Rust 1.99.1.
 
 ### Security
 

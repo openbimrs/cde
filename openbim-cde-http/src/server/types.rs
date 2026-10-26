@@ -109,6 +109,8 @@ impl fmt::Debug for AuthRequest {
 }
 
 /// Object-safe asynchronous request authentication policy.
+// async-trait marks the boxed future `#[must_use]`; clippy flags its own expansion.
+#[allow(clippy::double_must_use)]
 #[async_trait]
 pub trait AuthPolicy: Send + Sync {
     /// Authenticate a request or reject it.
@@ -444,6 +446,8 @@ impl fmt::Debug for UploadCancellationResponse {
 }
 
 /// Object-safe asynchronous implementation of all Foundation operations.
+// async-trait marks the boxed future `#[must_use]`; clippy flags its own expansion.
+#[allow(clippy::double_must_use)]
 #[async_trait]
 pub trait FoundationService: Send + Sync {
     /// `GET /foundation/versions`.

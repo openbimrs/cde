@@ -11,4 +11,4 @@ Executable HTTP adapters for `openbim-cde` wire contracts.
 - JSON requests are bounded before deserialization and service dispatch. Binary
   upload/download bodies stay streaming.
 - Every public behavior and security invariant must be test-driven.
-- Verify with the crate manifest directly on stable and Rust 1.85.0.
+- Verify with the crate manifest directly on Rust 1.99.1.

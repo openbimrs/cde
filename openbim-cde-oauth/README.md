@@ -4,7 +4,7 @@ Secure OAuth 2 execution and generation-aware token persistence for
 buildingSMART openCDE Foundation API 1.1 discovery contracts.
 
 Publication is disabled pending upstream contract translation/distribution
-clearance. Rust edition 2021; MSRV 1.85.
+clearance. Rust edition 2021; MSRV 1.99.
 
 ## Implemented
 

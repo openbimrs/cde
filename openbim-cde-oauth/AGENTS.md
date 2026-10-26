@@ -14,18 +14,15 @@ into the wire-model crate.
 - Preserve stored credentials after any failed exchange; rotate via TokenStore CAS only.
 - Do not add plaintext file persistence.
 - The reqwest adapter remains HTTPS-only, redirect-free, bounded, and diagnostic-redacted.
-- Keep `keyring` exactly at 3.6.3 while MSRV is 1.85.
+- Keep `keyring` exactly at 3.6.3.
 
 ## Verification
 
-Use an isolated target directory and run stable plus Rust 1.85:
+Use an isolated target directory and run on the pinned toolchain (Rust 1.99.1):
 
 ```sh
-cargo +stable fmt --check
-CARGO_TARGET_DIR=/tmp/openbim-cde-oauth-stable cargo +stable test --all-features
-CARGO_TARGET_DIR=/tmp/openbim-cde-oauth-stable cargo +stable clippy --all-features --all-targets -- -D warnings
-CARGO_TARGET_DIR=/tmp/openbim-cde-oauth-stable cargo +stable doc --all-features --no-deps
-CARGO_TARGET_DIR=/tmp/openbim-cde-oauth-185 cargo +1.85.0 test --all-features
-CARGO_TARGET_DIR=/tmp/openbim-cde-oauth-185 cargo +1.85.0 clippy --all-features --all-targets -- -D warnings
-CARGO_TARGET_DIR=/tmp/openbim-cde-oauth-185 cargo +1.85.0 doc --all-features --no-deps
+cargo fmt --check
+CARGO_TARGET_DIR=/tmp/openbim-cde-oauth cargo test --all-features
+CARGO_TARGET_DIR=/tmp/openbim-cde-oauth cargo clippy --all-features --all-targets -- -D warnings
+CARGO_TARGET_DIR=/tmp/openbim-cde-oauth cargo doc --all-features --no-deps
 ```
